@@ -1,0 +1,88 @@
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Data of users in bipolar form
+d1 = -1  # User 1 sends binary 0
+d2 = +1  # User 2 sends binary 1
+
+# Spreading codes
+# User 1: 010111
+c1 = np.array([-1, +1, -1, +1, +1, +1])
+
+# User 2: 110001
+c2 = np.array([+1, +1, -1, -1, -1, +1])
+
+# Generate spread signals
+s1 = d1 * c1
+s2 = d2 * c2
+
+print("User 1 data:", d1)
+print("User 1 spreading code:", c1)
+print("User 1 spread signal:", s1)
+print()
+
+print("User 2 data:", d2)
+print("User 2 spreading code:", c2)
+print("User 2 spread signal:", s2)
+
+# Combine both signals
+received_signal = s1 + s2
+
+print()
+print("Combined received signal:")
+print(received_signal)
+
+# Decode User 1
+correlation_u1 = np.dot(received_signal, c1)
+decoded_u1 = correlation_u1 / len(c1)
+
+print()
+print("User 1 correlation:", correlation_u1)
+print("User 1 decoded value:", decoded_u1)
+
+# Decode User 2
+correlation_u2 = np.dot(received_signal, c2)
+decoded_u2 = correlation_u2 / len(c2)
+
+print()
+print("User 2 correlation:", correlation_u2)
+print("User 2 decoded value:", decoded_u2)
+
+# Convert decoded values into binary
+decoded_bit_u1 = 0 if decoded_u1 < 0 else 1
+decoded_bit_u2 = 0 if decoded_u2 < 0 else 1
+
+print()
+print("================================")
+print("FINAL DECODED DATA")
+print("================================")
+print("User 1:", decoded_bit_u1)
+print("User 2:", decoded_bit_u2)
+
+# Graphical representation
+plt.figure(figsize=(10, 8))
+
+plt.subplot(3, 1, 1)
+plt.stem(range(len(s1)), s1)
+plt.title("User 1 Spread Signal")
+plt.xlabel("Chip Index")
+plt.ylabel("Amplitude")
+plt.grid(True)
+
+plt.subplot(3, 1, 2)
+plt.stem(range(len(s2)), s2)
+plt.title("User 2 Spread Signal")
+plt.xlabel("Chip Index")
+plt.ylabel("Amplitude")
+plt.grid(True)
+
+plt.subplot(3, 1, 3)
+plt.stem(range(len(received_signal)), received_signal)
+plt.title("Combined Received Signal")
+plt.xlabel("Chip Index")
+plt.ylabel("Amplitude")
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()
