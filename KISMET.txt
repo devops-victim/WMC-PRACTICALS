@@ -1,0 +1,104 @@
+## Experiment: Installation and Configuration of Kismet on Ubuntu
+
+Aim: To install and configure Kismet on Ubuntu, enable monitor mode on a wireless network interface, and capture and analyze nearby Wi-Fi packets.
+
+### 1. Install Kismet
+
+Open the Ubuntu terminal and execute:
+
+```
+sudo apt update
+sudo apt install kismet -y
+```
+
+Verify the installation:
+
+```
+kismet --version
+```
+
+### 2. Identify the Wireless Interface
+
+```
+iw dev
+```
+
+Example wireless interface: `wlp5s0`
+
+### 3. Enable Monitor Mode
+
+First, disconnect the wireless interface from any active Wi-Fi connection if necessary.
+
+```
+sudo ip link set wlp5s0 down
+sudo iw dev wlp5s0 set type monitor
+sudo ip link set wlp5s0 up
+```
+
+Verify monitor mode:
+
+```
+iw dev wlp5s0 info
+```
+
+Expected output includes:
+
+```
+type monitor
+```
+
+### 4. Start Kismet
+
+```
+sudo kismet -c wlp5s0
+```
+
+Kismet can also create a monitor-mode virtual interface automatically when supported by the wireless adapter and driver.
+
+### 5. Open the Kismet Web Interface
+
+Open your browser and enter:
+
+```
+http://localhost:2501
+```
+
+Complete the initial login setup if prompted.
+
+The interface displays nearby wireless networks and devices, including SSID, BSSID, channel, frequency, signal strength, encryption type, and packet counts.
+
+### 6. Analyze Captured Packets
+
+Observe the detected networks and examine their details, including packet activity and security information.
+
+Only monitor networks and devices you own or are authorized to analyze.
+
+### 7. Restore Managed Mode
+
+After stopping Kismet, if you manually changed `wlp5s0` to monitor mode, restore it:
+
+```
+sudo ip link set wlp5s0 down
+sudo iw dev wlp5s0 set type managed
+sudo ip link set wlp5s0 up
+```
+
+### Troubleshooting
+
+Your provided output shows channel-setting errors such as:
+
+```
+mac80211_setchannel() could not set channel 136
+```
+
+This may occur because the wireless adapter, driver, or regulatory configuration does not support the requested channel. Check supported frequencies using:
+
+```
+iw list
+```
+
+You can then configure Kismet to monitor only supported channels.
+
+Result: Kismet was configured to detect nearby Wi-Fi networks and observe wireless packet activity. The supplied experiment output shows detected networks and captured packets, although some channel-switching errors occurred.
+
+Conclusion: Kismet demonstrates passive wireless monitoring using an adapter operating in monitor mode. It identifies nearby wireless networks and analyzes their properties, making it useful for wireless network troubleshooting and security analysis.
