@@ -1,0 +1,77 @@
+clc;
+clear;
+close all;
+
+% Transmitter: Generate sine wave
+fs = 1000;
+t = 0:1/fs:1;
+A = 1;
+f = 5;
+
+input_signal = A * sin(2 * pi * f * t);
+
+% Channel: Add AWGN noise
+snr_db = 10;
+
+signal_power = mean(input_signal.^2);
+noise_power = signal_power / (10^(snr_db/10));
+
+noise = sqrt(noise_power) * randn(size(input_signal));
+
+received_signal = input_signal + noise;
+
+% Receiver: Moving Average Low Pass Filter
+window = 20;
+b = ones(1, window) / window;
+
+filtered_signal = filter(b, 1, received_signal);
+
+% Calculate Actual SNR
+actual_noise = received_signal - input_signal;
+
+actual_snr = 10 * log10(mean(input_signal.^2) / ...
+                        mean(actual_noise.^2));
+
+% Display Communication System Parameters
+fprintf('\n');
+fprintf('--------------- Communication System Parameters ---------------\n');
+fprintf('Amplitude : %.2f\n', A);
+fprintf('Frequency : %.2f Hz\n', f);
+fprintf('Sampling Frequency : %d Hz\n', fs);
+fprintf('Desired SNR : %.2f dB\n', snr_db);
+fprintf('Signal Power : %.4f\n', signal_power);
+fprintf('Noise Power : %.4f\n', noise_power);
+fprintf('Actual SNR : %.2f dB\n', actual_snr);
+fprintf('Filter Window Size : %d Samples\n', window);
+fprintf('---------------------------------------------------------------\n');
+
+% Plot Results
+figure;
+
+subplot(4,1,1);
+plot(t, input_signal, 'b', 'LineWidth', 2);
+title('Original Input Signal');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
+
+subplot(4,1,2);
+plot(t, noise, 'r');
+title('AWGN Noise');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
+
+subplot(4,1,3);
+plot(t, received_signal, 'k');
+title('Received Signal (Signal + AWGN)');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
+
+subplot(4,1,4);
+plot(t, filtered_signal, 'g', 'LineWidth', 2);
+title('Recovered Signal After Low Pass Filter');
+xlabel('Time (s)');
+ylabel('Amplitude');
+grid on;
